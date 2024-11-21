@@ -1,0 +1,48 @@
+#ifndef CTREE_H
+#define CTREE_H
+
+#include "CNode.h"
+#include <vector>
+#include <string>
+#include <iostream>
+#include <stdexcept>
+#include <sstream>
+#include <algorithm>
+#include <cmath>
+#include <cfloat> 
+#define DEFAULT_NODE_VALUE "1"
+
+class CTree {
+private:
+    CNode* root;
+    void deleteTree(CNode* node);
+    void fixExpression(CNode* node);
+    void getNodes(CNode* node, std::vector<std::string>& values) const;
+    void getVars(CNode* node, std::vector<std::string>& vars) const;
+    CNode* copySubtree(CNode* node) const;
+
+    double evaluateNode(CNode* node, const std::vector<std::string>& vars, const std::vector<double>& values, std::string& errorMsg) const;
+    double OperateOnOperator(CNode* node, const std::vector<std::string>& vars, const std::vector<double>& values, std::string& errorMsg) const;
+    double OperateOnVariable(const std::string& nodeValue, const std::vector<std::string>& vars, const std::vector<double>& values, std::string& errorMsg) const;
+    CNode* buildSubtree(std::istringstream& stream, std::string& message);
+    bool isOperator(const std::string& value) const;
+    bool isVariable(const std::string& value) const;
+    std::string sanitizeVariable(const std::string& variable, std::string& message) const;
+    CNode* replaceLeafWithSubtree(CNode* leaf, CNode* subtree) const;
+    CNode* replaceLeafWithSubtree(CNode* leaf, CNode* subtree, bool& replaced) const;
+
+public:
+    CTree();
+    ~CTree();
+    CTree(const CTree& other);
+
+    CTree& operator=(const CTree& other);
+    CTree operator+(const CTree& other) const;
+
+    void buildTree(std::istringstream& stream, std::string& message);
+    void getTreeNodeValues(std::vector<std::string>& values) const;
+    void getTreeVars(std::vector<std::string>& vars) const;
+    void compute(double& result, const std::vector<double>& values, const std::vector<std::string>& vars, std::string& message) const;
+};
+
+#endif // CTREE_H
