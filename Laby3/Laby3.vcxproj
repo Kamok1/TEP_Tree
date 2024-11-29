@@ -131,7 +131,6 @@
     <ClCompile Include="CNode.h" />
     <ClCompile Include="CTree.cpp" />
     <ClCompile Include="Laby3.cpp" />
-    <ClCompile Include="Laby3_gpt.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CTree.h" />

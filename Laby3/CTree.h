@@ -11,6 +11,10 @@
 #include <cmath>
 #include <cfloat> 
 #define DEFAULT_NODE_VALUE "1"
+#define DEFAULT_SIN_COS_CHILDREN 1
+#define DEFAULT_OPERATOR_CHILDREN 2
+#define DEFAULT_VALUE_FOR_BASIC_OPERATIONS 0
+#define DEFAULT_VALUE_FOR_COMPLEX_OPERATIONS 1
 
 class CTree {
 private:
@@ -30,6 +34,7 @@ private:
     std::string sanitizeVariable(const std::string& variable, std::string& message) const;
     CNode* replaceLeafWithSubtree(CNode* leaf, CNode* subtree) const;
     CNode* replaceLeafWithSubtree(CNode* leaf, CNode* subtree, bool& replaced) const;
+    int getRequiredArgs(const std::string& operatorToken) const;
 
 public:
     CTree();
@@ -45,4 +50,4 @@ public:
     void compute(double& result, const std::vector<double>& values, const std::vector<std::string>& vars, std::string& message) const;
 };
 
-#endif // CTREE_H
+#endif

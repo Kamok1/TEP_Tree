@@ -26,11 +26,10 @@ std::string doubleToString(double value) {
     return oss.str();
 }
 
-bool parseCommand(const std::string& command, CTree& tree) {
+void parseCommand(const std::string& command, CTree& tree, bool& state) {
     std::istringstream iss(command);
     std::string cmd;
     iss >> cmd;
-    bool state = true;
             
     if (cmd == "exit") {
         showMessage("Exiting program. Goodbye!");
@@ -82,7 +81,6 @@ bool parseCommand(const std::string& command, CTree& tree) {
         }
     }
     else handleError("Unknown command");
-    return state;
 }
 
 int main() {
@@ -90,11 +88,11 @@ int main() {
     bool running = true;
     std::string command;
 
-    std::cout << "Enter commands (type 'exit' to quit):" << std::endl;
+    showMessage("Enter commands (type 'exit' to quit):");
     while (running) {
         std::cout << "> ";
         std::getline(std::cin, command);
-        running = parseCommand(command,tree);
+        parseCommand(command,tree, running);
     }
 
     return 0;

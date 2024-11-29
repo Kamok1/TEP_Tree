@@ -11,7 +11,6 @@ private:
 
 public:
     CNode(const std::string& val, int count);
-
     ~CNode();
 
     void setChild(int index, CNode* child);

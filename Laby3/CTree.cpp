@@ -7,13 +7,13 @@ CTree::~CTree() {
 }
 
 CTree::CTree(const CTree& other) : root(NULL) {
-    if (other.root) {
+    if (other.root)
         root = copySubtree(other.root);
-    }
 }
 
 CNode* CTree::copySubtree(CNode* node) const{
-    if (!node) return NULL;
+    if (!node) 
+        return NULL;
 
     CNode* newNode = new CNode(node->getValue(), node->getChildCount());
 
@@ -46,14 +46,14 @@ CTree CTree::operator+(const CTree& other) const {
     return newTree;
 }
 
-
 CNode* CTree::replaceLeafWithSubtree(CNode* node, CNode* subtree) const {
     bool isReplaced = false;
     return replaceLeafWithSubtree(node, subtree, isReplaced);
 }
 
 CNode* CTree::replaceLeafWithSubtree(CNode* node, CNode* subtree, bool& isReplaced) const {
-    if (!node) return NULL;
+    if (!node) 
+        return NULL;
 
     if (node->getChildCount() == 0 && !isReplaced) {
         isReplaced = true;
@@ -68,9 +68,9 @@ CNode* CTree::replaceLeafWithSubtree(CNode* node, CNode* subtree, bool& isReplac
     return newNode;
 }
 
-
 void CTree::deleteTree(CNode* node) {
-    if (!node) return;
+    if (!node) 
+        return;
 
     for (int i = 0; i < node->getChildCount(); ++i) {
         CNode* child = node->getChild(i);
@@ -82,9 +82,9 @@ void CTree::deleteTree(CNode* node) {
     delete node;
 }
 
-
 void CTree::getNodes(CNode* node, std::vector<std::string>& values) const {
-    if (!node) return;
+    if (!node) 
+        return;
     values.push_back(node->getValue());
     for (int i = 0; i < node->getChildCount(); ++i) {
         getNodes(node->getChild(i), values);
@@ -92,7 +92,8 @@ void CTree::getNodes(CNode* node, std::vector<std::string>& values) const {
 }
 
 void CTree::getVars(CNode* node, std::vector<std::string>& vars) const {
-    if (!node) return;
+    if (!node) 
+        return;
     if (isVariable(node->getValue())) {
         if (std::find(vars.begin(), vars.end(), node->getValue()) == vars.end()) {
             vars.push_back(node->getValue());
@@ -111,31 +112,57 @@ double CTree::evaluateNode(CNode* node, const std::vector<std::string>& vars, co
 
     std::string nodeValue = node->getValue();
 
-    if (isOperator(nodeValue)) return OperateOnOperator(node, vars, values, errorMsg);
-    else if (isVariable(nodeValue)) return OperateOnVariable(nodeValue, vars, values, errorMsg);
+    if (isOperator(nodeValue)) 
+        return OperateOnOperator(node, vars, values, errorMsg);
+    else if (isVariable(nodeValue)) 
+        return OperateOnVariable(nodeValue, vars, values, errorMsg);
     return std::atof(nodeValue.c_str());
 }
 
 double CTree::OperateOnOperator(CNode* node, const std::vector<std::string>& vars, const std::vector<double>& values, std::string& errorMsg) const {
     std::string nodeValue = node->getValue();
-    CNode* child0 = node->getChild(0);
-    CNode* child1 = node->getChild(1);
+    int childCount = node->getChildCount();
+    int requiredArgs = getRequiredArgs(nodeValue);
 
-    if (nodeValue == "+") return evaluateNode(child0, vars, values, errorMsg) + evaluateNode(child1, vars, values, errorMsg);
-    if (nodeValue == "-") return evaluateNode(child0, vars, values, errorMsg) - evaluateNode(child1, vars, values, errorMsg);
-    if (nodeValue == "*") return evaluateNode(child0, vars, values, errorMsg) * evaluateNode(child1, vars, values, errorMsg);
-    if (nodeValue == "sin") return std::sin(evaluateNode(child0, vars, values, errorMsg));
-    if (nodeValue == "cos") return std::cos(evaluateNode(child0, vars, values, errorMsg));
-    if (nodeValue == "/") {
-        double denominator = evaluateNode(child1, vars, values, errorMsg);
-        if (denominator == 0) errorMsg = "Division by zero";
-            //return -DBL_MAX;
-        return evaluateNode(child0, vars, values, errorMsg) / denominator;
+
+    if (nodeValue == "sin") 
+        return std::sin(evaluateNode(node->getChild(0), vars, values, errorMsg));
+    if (nodeValue == "cos") 
+        return std::cos(evaluateNode(node->getChild(0), vars, values, errorMsg));
+
+    double result = (nodeValue == "+" || nodeValue == "-") ? DEFAULT_VALUE_FOR_BASIC_OPERATIONS : DEFAULT_VALUE_FOR_COMPLEX_OPERATIONS;
+    for (int i = 0; i < childCount; ++i) {
+        CNode* child = node->getChild(i);
+        double childResult = evaluateNode(child, vars, values, errorMsg);
+
+        if (!errorMsg.empty())
+            return -DBL_MAX;
+
+        if (nodeValue == "+") 
+            result += childResult;
+
+        else if (nodeValue == "*")
+            result *= childResult;
+
+        else if (nodeValue == "-")
+            result = (i == 0) ? childResult : result - childResult;
+        
+        else if (nodeValue == "/") {
+            if (i > 0 && childResult == 0) {
+                errorMsg = "Division by zero";
+                return -DBL_MAX;
+            }
+            result = (i == 0) ? childResult : result / childResult;
+        }
+        else {
+            errorMsg = "Unsupported operator: " + nodeValue;
+            return -DBL_MAX;
+        }
     }
 
-    errorMsg = "Unsupported operator: " + nodeValue;
-    return -DBL_MAX;
+    return result;
 }
+
 
 double CTree::OperateOnVariable(const std::string& nodeValue, const std::vector<std::string>& vars, const std::vector<double>& values, std::string& errorMsg) const {
     for (int i = 0; i < vars.size(); ++i) {
@@ -146,8 +173,6 @@ double CTree::OperateOnVariable(const std::string& nodeValue, const std::vector<
     errorMsg = "Variable '" + nodeValue + "' not found in provided values";
     return -DBL_MAX;
 }
-
-
 
 
 bool CTree::isOperator(const std::string& value) const {
@@ -167,7 +192,6 @@ std::string CTree::sanitizeVariable(const std::string& variable, std::string& me
     return sanitized;
 }
 
-
 CNode* CTree::buildSubtree(std::istringstream& stream, std::string& message) {
     std::string token;
     if (!(stream >> token)) {
@@ -176,10 +200,10 @@ CNode* CTree::buildSubtree(std::istringstream& stream, std::string& message) {
     }
 
     if (isOperator(token)) {
-        int requiredArgs = (token == "sin" || token == "cos") ? 1 : 2;
+        int requiredArgs = getRequiredArgs(token);
         CNode* node = new CNode(token, requiredArgs);
 
-        for (int i = 0; i < requiredArgs; ++i) {
+		for (int i = 0; i < requiredArgs; ++i) {
             CNode* child = buildSubtree(stream, message);
             node->setChild(i, child);
         }
@@ -189,23 +213,32 @@ CNode* CTree::buildSubtree(std::istringstream& stream, std::string& message) {
     return new CNode(token, 0);
 }
 
+int CTree::getRequiredArgs(const std::string& operatorToken) const {
+    if (operatorToken == "sin" || operatorToken == "cos") 
+        return DEFAULT_SIN_COS_CHILDREN;
+    if (operatorToken == "+" || operatorToken == "-" || operatorToken == "*" || operatorToken == "/") 
+        return DEFAULT_OPERATOR_CHILDREN;
+    return 0;
+}
+
+
 void CTree::buildTree(std::istringstream& stream, std::string& message) {
     deleteTree(root);
     root = buildSubtree(stream, message);
 
     std::string leftover;
-    if (stream >> leftover) {
+    if (stream >> leftover)
         message += "Unexpected token: " + leftover + "\n";
-    }
 }
 
-
 void CTree::getTreeNodeValues(std::vector<std::string>& values) const {
-    if (root) getNodes(root, values);
+    if (root) 
+        getNodes(root, values);
 }
 
 void CTree::getTreeVars(std::vector<std::string>& vars) const {
-    if (root) getVars(root, vars);
+    if (root) 
+        getVars(root, vars);
 }
 
 void CTree::compute(double& result ,const std::vector<double>& values, const std::vector<std::string>& vars, std::string& message) const {
