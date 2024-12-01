@@ -15,6 +15,13 @@
 #define DEFAULT_OPERATOR_CHILDREN 2
 #define DEFAULT_VALUE_FOR_BASIC_OPERATIONS 0
 #define DEFAULT_VALUE_FOR_COMPLEX_OPERATIONS 1
+#define SUM "+"
+#define SUB "-"
+#define MUL "*"
+#define DIV "/"
+#define SIN "sin"
+#define COS "cos"
+#define MAX4 "MAX4"
 
 class CTree {
 private:
@@ -28,7 +35,7 @@ private:
     double evaluateNode(CNode* node, const std::vector<std::string>& vars, const std::vector<double>& values, std::string& errorMsg) const;
     double OperateOnOperator(CNode* node, const std::vector<std::string>& vars, const std::vector<double>& values, std::string& errorMsg) const;
     double OperateOnVariable(const std::string& nodeValue, const std::vector<std::string>& vars, const std::vector<double>& values, std::string& errorMsg) const;
-    CNode* buildSubtree(std::istringstream& stream, std::string& message);
+    CNode* buildSubtree(std::istringstream& stream, std::string& message, bool hasToBeOperator);
     bool isOperator(const std::string& value) const;
     bool isVariable(const std::string& value) const;
     std::string sanitizeVariable(const std::string& variable, std::string& message) const;

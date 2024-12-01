@@ -125,12 +125,13 @@ double CTree::OperateOnOperator(CNode* node, const std::vector<std::string>& var
     int requiredArgs = getRequiredArgs(nodeValue);
 
 
-    if (nodeValue == "sin") 
+    if (nodeValue == SIN) 
         return std::sin(evaluateNode(node->getChild(0), vars, values, errorMsg));
-    if (nodeValue == "cos") 
+    if (nodeValue == COS) 
         return std::cos(evaluateNode(node->getChild(0), vars, values, errorMsg));
 
-    double result = (nodeValue == "+" || nodeValue == "-") ? DEFAULT_VALUE_FOR_BASIC_OPERATIONS : DEFAULT_VALUE_FOR_COMPLEX_OPERATIONS;
+
+    double result = (nodeValue == SUM || nodeValue == SUB || nodeValue == MAX4) ? DEFAULT_VALUE_FOR_BASIC_OPERATIONS : DEFAULT_VALUE_FOR_COMPLEX_OPERATIONS;
     for (int i = 0; i < childCount; ++i) {
         CNode* child = node->getChild(i);
         double childResult = evaluateNode(child, vars, values, errorMsg);
@@ -138,16 +139,19 @@ double CTree::OperateOnOperator(CNode* node, const std::vector<std::string>& var
         if (!errorMsg.empty())
             return -DBL_MAX;
 
-        if (nodeValue == "+") 
+        if (nodeValue == MAX4)
+            result = result > childResult ? result : childResult;
+
+        else if (nodeValue == SUM) 
             result += childResult;
 
-        else if (nodeValue == "*")
+        else if (nodeValue == MUL)
             result *= childResult;
 
-        else if (nodeValue == "-")
+        else if (nodeValue == SUB)
             result = (i == 0) ? childResult : result - childResult;
         
-        else if (nodeValue == "/") {
+        else if (nodeValue == DIV) {
             if (i > 0 && childResult == 0) {
                 errorMsg = "Division by zero";
                 return -DBL_MAX;
@@ -176,11 +180,11 @@ double CTree::OperateOnVariable(const std::string& nodeValue, const std::vector<
 
 
 bool CTree::isOperator(const std::string& value) const {
-    return value == "+" || value == "-" || value == "*" || value == "/" || value == "sin" || value == "cos";
+    return value == SUM || value == SUB || value == MUL || value == DIV || value == SIN || value == COS || value == MAX4;
 }
 
 bool CTree::isVariable(const std::string& value) const {
-    return value != "sin" && value != "cos" && std::isalpha(value[0]);
+    return value != SIN && value != COS && value != MAX4 && std::isalpha(value[0]);
 }
 
 std::string CTree::sanitizeVariable(const std::string& variable, std::string& message) const {
@@ -192,19 +196,28 @@ std::string CTree::sanitizeVariable(const std::string& variable, std::string& me
     return sanitized;
 }
 
-CNode* CTree::buildSubtree(std::istringstream& stream, std::string& message) {
+CNode* CTree::buildSubtree(std::istringstream& stream, std::string& message, bool hasToBeOperator) {
     std::string token;
     if (!(stream >> token)) {
         message += "Unexpected end of expression \n";
         token = DEFAULT_NODE_VALUE;
     }
 
-    if (isOperator(token)) {
+    bool isTokenOperator = isOperator(token);
+    if (isTokenOperator == false && hasToBeOperator)
+    {
+        message += "Expected operator";
+        return new CNode(token, 0);
+    }
+
+
+    if (isTokenOperator) {
         int requiredArgs = getRequiredArgs(token);
         CNode* node = new CNode(token, requiredArgs);
 
 		for (int i = 0; i < requiredArgs; ++i) {
-            CNode* child = buildSubtree(stream, message);
+            bool hasToBeOperator = (token == MAX4 && (i == 0 || i == 3));
+            CNode* child = buildSubtree(stream, message, hasToBeOperator);
             node->setChild(i, child);
         }
         return node;
@@ -214,17 +227,19 @@ CNode* CTree::buildSubtree(std::istringstream& stream, std::string& message) {
 }
 
 int CTree::getRequiredArgs(const std::string& operatorToken) const {
-    if (operatorToken == "sin" || operatorToken == "cos") 
+    if (operatorToken == SIN || operatorToken == COS) 
         return DEFAULT_SIN_COS_CHILDREN;
-    if (operatorToken == "+" || operatorToken == "-" || operatorToken == "*" || operatorToken == "/") 
+    if (operatorToken == SUM || operatorToken == SUB || operatorToken == MUL || operatorToken == DIV) 
         return DEFAULT_OPERATOR_CHILDREN;
+    if (operatorToken == MAX4)
+        return 4;
     return 0;
 }
 
 
 void CTree::buildTree(std::istringstream& stream, std::string& message) {
     deleteTree(root);
-    root = buildSubtree(stream, message);
+    root = buildSubtree(stream, message, false);
 
     std::string leftover;
     if (stream >> leftover)

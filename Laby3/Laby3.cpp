@@ -4,6 +4,12 @@
 #include <sstream>
 #include <cmath>
 #include "CTree.h"
+#define EXIT "exit"
+#define ENTER "enter"
+#define JOIN "join"
+#define PRINT "print"
+#define VARS "vars"
+#define COMP "comp"
 
 void printArray(const std::vector<std::string>& array) {
     for (int i = 0; i < array.size(); ++i) {
@@ -31,18 +37,18 @@ void parseCommand(const std::string& command, CTree& tree, bool& state) {
     std::string cmd;
     iss >> cmd;
             
-    if (cmd == "exit") {
+    if (cmd == EXIT) {
         showMessage("Exiting program. Goodbye!");
         state = false;
     }
 
-    else if (cmd == "enter") {
+    else if (cmd == ENTER) {
         std::string message;
         tree.buildTree(iss, message);
         if (!message.empty()) handleError(message);
     }
 
-    else if (cmd == "join") {
+    else if (cmd == JOIN) {
         CTree otherTree;
         std::string message;
         otherTree.buildTree(iss, message);
@@ -50,19 +56,19 @@ void parseCommand(const std::string& command, CTree& tree, bool& state) {
 		else tree = tree + otherTree;
     }
 
-    else if (cmd == "print") {
+    else if (cmd == PRINT) {
         std::vector<std::string> nodeValues;
         tree.getTreeNodeValues(nodeValues);
         printArray(nodeValues);
     }
 
-    else if (cmd == "vars") {
+    else if (cmd == VARS) {
         std::vector<std::string> vars;
         tree.getTreeVars(vars);
         printArray(vars);
     }
 
-    else if (cmd == "comp") {
+    else if (cmd == COMP) {
         std::vector<double> values;
         std::vector<std::string> vars;
         std::string message;
