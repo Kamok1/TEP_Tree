@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Errors">
+      <UniqueIdentifier>{e0809b07-9582-4fa3-baf1-dc32c9134898}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Errors\Enums">
+      <UniqueIdentifier>{d7782613-47bb-43de-8165-dd0fc0ea6f78}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Laby3.cpp">
@@ -27,9 +33,36 @@
     <ClCompile Include="CTree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CResultVoid.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CError.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorCode.h">
+      <Filter>Header Files\Errors\Enums</Filter>
+    </ClCompile>
+    <ClCompile Include="CResultSerializer.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Cli.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CResult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CError.h">
+      <Filter>Header Files\Errors</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorLevel.h">
+      <Filter>Header Files\Errors\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="Cli.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
