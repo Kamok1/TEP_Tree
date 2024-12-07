@@ -10,6 +10,7 @@ class CResult {
 public:
     CResult(const T& cValue);
     CResult(E* pcError);
+    CResult(const T& cValue, std::vector<E*>& vErrors);
     CResult(std::vector<E*>& vErrors);
     CResult(const CResult<T, E>& other);
     ~CResult();
@@ -20,6 +21,7 @@ public:
 
     CResult<T, E>& operator=(const CResult<T, E>& other);
 
+    bool bIsError() const;
     bool bIsSuccess() const;
     T cGetValue() const;
     const std::vector<E*>& vGetErrors() const;
@@ -39,11 +41,14 @@ CResult<T, E>::CResult(E* pcError) : pcValue(NULL) {
 }
 
 template <typename T, typename E>
+CResult<T, E>::CResult(const T& cValue, std::vector<E*>& vErrors) : pcValue(new T(cValue)), errors(vErrors) {}
+
+template <typename T, typename E>
 CResult<T, E>::CResult(std::vector<E*>& vErrors) : pcValue(NULL), errors(vErrors) {}
 
 template <typename T, typename E>
 CResult<T, E>::CResult(const CResult<T, E>& other) : pcValue(NULL), errors() {
-    if (other.pc_value != NULL) {
+    if (other.pcValue != NULL) {
         pcValue = new T(*(other.pcValue));
     }
     for (int i = 0; i < other.errors.size(); ++i) {
@@ -55,7 +60,8 @@ template <typename T, typename E>
 CResult<T, E>::~CResult() {
     delete pcValue;
     for (int i = 0; i < errors.size(); ++i) {
-        delete errors[i];
+        if(errors[i] != NULL)
+            delete errors[i];
     }
 }
 
@@ -94,6 +100,11 @@ CResult<T, E>& CResult<T, E>::operator=(const CResult<T, E>& other) {
 template <typename T, typename E>
 bool CResult<T, E>::bIsSuccess() const {
     return pcValue != NULL;
+}
+
+template <typename T, typename E>
+bool CResult<T, E>::bIsError() const {
+    return !errors.empty();
 }
 
 template <typename T, typename E>

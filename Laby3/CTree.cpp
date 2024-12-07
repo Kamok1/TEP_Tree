@@ -104,78 +104,73 @@ void CTree::getVars(CNode* node, std::vector<std::string>& vars) const {
     }
 }
 
-double CTree::evaluateNode(CNode* node, const std::vector<std::string>& vars, const std::vector<double>& values, std::string& errorMsg) const {
+CResult<double, CError> CTree::evaluateNode(CNode* node, const std::vector<std::string>& vars, const std::vector<double>& values) const {
     if (!node) {
-        errorMsg = "Invalid node";
-        return -DBL_MAX;
+        return new CError(ERROR_NULL_REFERENCE, ERROR, "Invalid node");
     }
 
     std::string nodeValue = node->getValue();
 
     if (isOperator(nodeValue)) 
-        return OperateOnOperator(node, vars, values, errorMsg);
+        return OperateOnOperator(node, vars, values);
     else if (isVariable(nodeValue)) 
-        return OperateOnVariable(nodeValue, vars, values, errorMsg);
+        return OperateOnVariable(nodeValue, vars, values);
     return std::atof(nodeValue.c_str());
 }
 
-double CTree::OperateOnOperator(CNode* node, const std::vector<std::string>& vars, const std::vector<double>& values, std::string& errorMsg) const {
+CResult<double, CError> CTree::OperateOnOperator(CNode* node, const std::vector<std::string>& vars, const std::vector<double>& values) const {
     std::string nodeValue = node->getValue();
     int childCount = node->getChildCount();
     int requiredArgs = getRequiredArgs(nodeValue);
-
-
-    if (nodeValue == SIN) 
-        return std::sin(evaluateNode(node->getChild(0), vars, values, errorMsg));
-    if (nodeValue == COS) 
-        return std::cos(evaluateNode(node->getChild(0), vars, values, errorMsg));
-
-
     double result = (nodeValue == SUM || nodeValue == SUB || nodeValue == MAX4) ? DEFAULT_VALUE_FOR_BASIC_OPERATIONS : DEFAULT_VALUE_FOR_COMPLEX_OPERATIONS;
     for (int i = 0; i < childCount; ++i) {
         CNode* child = node->getChild(i);
-        double childResult = evaluateNode(child, vars, values, errorMsg);
+        CResult<double, CError> childResult = evaluateNode(child, vars, values);
 
-        if (!errorMsg.empty())
-            return -DBL_MAX;
+        if (childResult.bIsSuccess() == false)
+            return childResult;
 
-        if (nodeValue == MAX4)
-            result = result > childResult ? result : childResult;
+        double childResultValue = childResult.cGetValue();
 
-        else if (nodeValue == SUM) 
-            result += childResult;
+        if (nodeValue == SIN)
+            result = std::sin(childResultValue);
+
+        else if (nodeValue == COS)
+            result = std::cos(childResultValue);
+
+        else if (nodeValue == MAX4)
+            result = result > childResultValue ? result : childResultValue;
+
+        else if (nodeValue == SUM)
+            result += childResultValue;
 
         else if (nodeValue == MUL)
-            result *= childResult;
+            result *= childResultValue;
 
         else if (nodeValue == SUB)
-            result = (i == 0) ? childResult : result - childResult;
-        
+            result = (i == 0) ? childResultValue : result - childResultValue;
+
         else if (nodeValue == DIV) {
-            if (i > 0 && childResult == 0) {
-                errorMsg = "Division by zero";
-                return -DBL_MAX;
+            if (i > 0 && childResultValue == 0) {
+                return new CError(ERROR_DIVISION_BY_ZERO, ERROR, "Division by zero");
             }
-            result = (i == 0) ? childResult : result / childResult;
+            result = (i == 0) ? childResultValue : result / childResultValue;
         }
         else {
-            errorMsg = "Unsupported operator: " + nodeValue;
-            return -DBL_MAX;
+            return new CError(ERROR_INVALID_INPUT, ERROR, "Unsupported operator: " + nodeValue);
         }
     }
-
     return result;
 }
 
 
-double CTree::OperateOnVariable(const std::string& nodeValue, const std::vector<std::string>& vars, const std::vector<double>& values, std::string& errorMsg) const {
+CResult<double, CError> CTree::OperateOnVariable(const std::string& nodeValue, const std::vector<std::string>& vars, const std::vector<double>& values) const {
     for (int i = 0; i < vars.size(); ++i) {
         if (vars[i] == nodeValue) {
             return values[i];
         }
     }
-    errorMsg = "Variable '" + nodeValue + "' not found in provided values";
-    return -DBL_MAX;
+    return new CError(ERROR_INVALID_INPUT, ERROR, "Variable '" + nodeValue + "' not found in provided values");
 }
 
 
@@ -187,43 +182,69 @@ bool CTree::isVariable(const std::string& value) const {
     return value != SIN && value != COS && value != MAX4 && std::isalpha(value[0]);
 }
 
-std::string CTree::sanitizeVariable(const std::string& variable, std::string& message) const {
+CResult<std::string, CError> CTree::sanitizeVariable(const std::string& variable) const {
     std::string sanitized;
+    std::vector<CError*> errors;
 
     for (char ch : variable) {
-        std::isalnum(ch) ? sanitized += ch : message += "Ignoring invalid character in variable: " + std::string(1, ch) + "\n";
+        if (std::isalnum(ch)) {
+			sanitized += ch;
+		}
+        else {
+            errors.push_back(new CError(ERROR_INVALID_INPUT, INFO, "Ignoring invalid character in variable: " + std::string(1, ch)));
+        }
     }
-    return sanitized;
+    return CResult<std::string, CError>(sanitized, errors);
 }
 
-CNode* CTree::buildSubtree(std::istringstream& stream, std::string& message, bool hasToBeOperator) {
+CResult<CNode*, CError> CTree::buildSubtree(std::istringstream& stream, bool hasToBeOperator) {
+
     std::string token;
+    std::vector<CError*> accumulatedErrors;
+
     if (!(stream >> token)) {
-        message += "Unexpected end of expression \n";
+        accumulatedErrors.push_back(new CError(ERROR_INVALID_INPUT, INFO, "Unexpected end of expression"));
         token = DEFAULT_NODE_VALUE;
     }
 
     bool isTokenOperator = isOperator(token);
     if (isTokenOperator == false && hasToBeOperator)
-    {
-        message += "Expected operator";
-        return new CNode(token, 0);
-    }
+        return new CError(ERROR_INVALID_INPUT, ERROR, "Expected operator");
+
+    CNode* node = new CNode(token, isTokenOperator ? getRequiredArgs(token) : 0);
 
 
     if (isTokenOperator) {
-        int requiredArgs = getRequiredArgs(token);
-        CNode* node = new CNode(token, requiredArgs);
-
-		for (int i = 0; i < requiredArgs; ++i) {
-            bool hasToBeOperator = (token == MAX4 && (i == 0 || i == 3));
-            CNode* child = buildSubtree(stream, message, hasToBeOperator);
-            node->setChild(i, child);
+        for (int i = 0; i < node->getChildCount(); ++i) {
+            bool childHasToBeOperator = (token == MAX4 && (i == 0 || i == 3));
+            CResult<CNode*, CError> childResult = buildSubtree(stream, childHasToBeOperator);
+            node->setChild(i, childResult.cGetValue());
+            if (childResult.bIsError())
+            {
+                const std::vector<CError*>& errors = childResult.vGetErrors();
+                for (std::vector<CError*>::const_iterator it = errors.begin(); it != errors.end(); ++it) {
+                    for (std::vector<CError*>::const_iterator it = errors.begin(); it != errors.end(); ++it) {
+                        accumulatedErrors.push_back(new CError(**it));
+                    }
+                }
+            }
         }
-        return node;
     }
-    else if (isVariable(token)) return new CNode(sanitizeVariable(token, message), 0);
-    return new CNode(token, 0);
+    else if (isVariable(token)) 
+    {
+        CResult<std::string, CError> sanitizedResult = sanitizeVariable(token);
+        if (!sanitizedResult.bIsSuccess())
+        {
+            const std::vector<CError*>& errors = sanitizedResult.vGetErrors();
+            for (std::vector<CError*>::const_iterator it = errors.begin(); it != errors.end(); ++it) {
+                for (std::vector<CError*>::const_iterator it = errors.begin(); it != errors.end(); ++it) {
+                    accumulatedErrors.push_back(new CError(**it));
+                }
+            }
+        }
+        node->setValue(sanitizedResult.cGetValue());
+    }
+    return CResult<CNode*, CError>(node, accumulatedErrors);
 }
 
 int CTree::getRequiredArgs(const std::string& operatorToken) const {
@@ -232,18 +253,22 @@ int CTree::getRequiredArgs(const std::string& operatorToken) const {
     if (operatorToken == SUM || operatorToken == SUB || operatorToken == MUL || operatorToken == DIV) 
         return DEFAULT_OPERATOR_CHILDREN;
     if (operatorToken == MAX4)
-        return 4;
-    return 0;
+        return DEFAULT_MAX4_CHILDREN;
+    return DEFAULT_CHILDREN;
 }
 
 
-void CTree::buildTree(std::istringstream& stream, std::string& message) {
+CResult<void, CError> CTree::buildTree(std::istringstream& stream) {
     deleteTree(root);
-    root = buildSubtree(stream, message, false);
+    CResult<CNode*, CError> result = buildSubtree(stream, false);
+    if (result.bIsSuccess())
+        root = result.cGetValue();
 
+    std::vector<CError*> errors = result.vGetErrors();
     std::string leftover;
     if (stream >> leftover)
-        message += "Unexpected token: " + leftover + "\n";
+        errors.push_back(new CError(ERROR_INVALID_INPUT, INFO, "Ignoring leftover: " + leftover));
+    return CResult<void, CError>(errors);
 }
 
 void CTree::getTreeNodeValues(std::vector<std::string>& values) const {
@@ -256,6 +281,6 @@ void CTree::getTreeVars(std::vector<std::string>& vars) const {
         getVars(root, vars);
 }
 
-void CTree::compute(double& result ,const std::vector<double>& values, const std::vector<std::string>& vars, std::string& message) const {
-    result = evaluateNode(root, vars, values, message);
+CResult<double, CError> CTree::compute(const std::vector<double>& values, const std::vector<std::string>& vars) const {
+     return evaluateNode(root, vars, values);
 }

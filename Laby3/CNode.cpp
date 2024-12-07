@@ -1,6 +1,6 @@
 #include "CNode.h"
 
-CNode::CNode(const std::string& val, int count): value(val), childCount(count) {
+CNode::CNode(const std::string& val, int count) : value(val), childCount(count) {
     children = new CNode * [childCount];
     for (int i = 0; i < childCount; ++i) {
         children[i] = NULL;
@@ -20,6 +20,10 @@ CNode::~CNode() {
 
 void CNode::setChild(int index, CNode* child) {
     if (index >= 0 && index < childCount) children[index] = child;
+}
+
+void CNode::setValue(const std::string& val) {
+	value = val;
 }
 
 const std::string& CNode::getValue() const {

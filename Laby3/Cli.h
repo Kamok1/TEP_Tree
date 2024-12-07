@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "CTree.h"
+#include "CResultVoid.h"
 
 #define EXIT "exit"
 #define ENTER "enter"
@@ -22,6 +23,7 @@ private:
     void printArray(const std::vector<std::string>& array);
     void showMessage(const std::string& message);
     void handleError(const std::string& message);
+    void handleCErrors(const std::vector<CError*>& errors);
     std::string doubleToString(double value);
 };
 

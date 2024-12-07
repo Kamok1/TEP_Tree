@@ -20,7 +20,7 @@ public:
 
     CResult<void, E>& operator=(const CResult<void, E>& cOther);
 
-    bool bIsSuccess() const;
+    bool bIsError() const;
     const std::vector<E*>& vGetErrors() const;
 
 private:
@@ -32,34 +32,30 @@ CResult<void, E>::CResult() : errors() {}
 
 template <typename E>
 CResult<void, E>::CResult(E* pcError) : errors() {
-    if (pcError != nullptr) {
-        errors.push_back(pcError);
-    }
+    errors.push_back(pcError);
 }
 
 template <typename E>
 CResult<void, E>::CResult(std::vector<E*>& vErrors) : errors() {
-    for (auto& error : vErrors) {
-        if (error != nullptr) {
-            errors.push_back(new E(*error));
-        }
+    for (int i = 0; i < vErrors.size(); ++i) {
+        errors.push_back(new E(*vErrors[i]));
     }
 }
+
 
 template <typename E>
 CResult<void, E>::CResult(const CResult<void, E>& cOther) : errors() {
-    for (auto& error : cOther.errors) {
-        if (error != nullptr) {
-            errors.push_back(new E(*error));
-        }
+    for (int i = 0; i < cOther.errors.size(); ++i) {
+        errors.push_back(new E(*cOther.errors[i]));
     }
 }
 
+
 template <typename E>
 CResult<void, E>::~CResult() {
-    for (auto& error : errors) {
-        delete error;
-    }
+    for(int i = 0; i < errors.size(); ++i) {
+		delete errors[i];
+	}
 }
 
 template <typename E>
@@ -80,22 +76,20 @@ CResult<void, E> CResult<void, E>::cFail(std::vector<E*>& vErrors) {
 template <typename E>
 CResult<void, E>& CResult<void, E>::operator=(const CResult<void, E>& cOther) {
     if (this != &cOther) {
-        for (auto& error : errors) {
-            delete error;
-        }
+    for(int i = 0; i < errors.size(); ++i) {
+		delete errors[i];
+	}
         errors.clear();
-        for (auto& error : cOther.errors) {
-            if (error != nullptr) {
-                errors.push_back(new E(*error));
-            }
+        for (int i = 0; i < cOther.errors.size(); ++i) {
+            errors.push_back(new E(*cOther.errors[i]));
         }
     }
     return *this;
 }
 
 template <typename E>
-bool CResult<void, E>::bIsSuccess() const {
-    return errors.empty();
+bool CResult<void, E>::bIsError() const {
+    return !errors.empty();
 }
 
 template <typename E>

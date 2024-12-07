@@ -8,6 +8,7 @@
 class CError {
 public:
     CError(ErrorCode code, ErrorLevel level, const std::string& description);
+    CError(const CError& other);
 
     ErrorCode getCode() const;
     ErrorLevel getLevel() const;

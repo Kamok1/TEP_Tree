@@ -14,6 +14,7 @@ public:
     ~CNode();
 
     void setChild(int index, CNode* child);
+    void setValue(const std::string& val);
 
     const std::string& getValue() const;
     int getChildCount() const;

@@ -5,6 +5,10 @@
 CError::CError(ErrorCode code, ErrorLevel level, const std::string& description)
     : code(code), level(level), description(description) {}
 
+
+CError::CError(const CError& other)
+    : code(other.code), level(other.level), description(other.description) {}
+
 ErrorCode CError::getCode() const {
     return code;
 }

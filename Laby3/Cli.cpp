@@ -29,16 +29,14 @@ void CLI::parseCommand(const std::string& command, CTree& tree, bool& state) {
     }
 
     else if (cmd == ENTER) {
-        std::string message;
-        tree.buildTree(iss, message);
-        if (!message.empty()) handleError(message);
+        CResult<void, CError> result = tree.buildTree(iss);
+        if (result.bIsError()) handleCErrors(result.vGetErrors());
     }
 
     else if (cmd == JOIN) {
         CTree otherTree;
-        std::string message;
-        otherTree.buildTree(iss, message);
-        if (!message.empty()) handleError(message);
+        CResult<void, CError> result = otherTree.buildTree(iss);
+        if (result.bIsError()) handleCErrors(result.vGetErrors());
         else tree = tree + otherTree;
     }
 
@@ -57,9 +55,7 @@ void CLI::parseCommand(const std::string& command, CTree& tree, bool& state) {
     else if (cmd == COMP) {
         std::vector<double> values;
         std::vector<std::string> vars;
-        std::string message;
         double value;
-        double result;
 
         while (iss >> value) {
             values.push_back(value);
@@ -68,9 +64,9 @@ void CLI::parseCommand(const std::string& command, CTree& tree, bool& state) {
 
         if (values.size() != vars.size()) handleError("Mismatch between number of variables and provided values");
         else {
-            tree.compute(result, values, vars, message);
-            if (!message.empty()) handleError(message);
-            else showMessage("Result:" + doubleToString(result));
+            CResult<double, CError> result = tree.compute(values, vars);
+            if (result.bIsError()) handleCErrors(result.vGetErrors());
+            else showMessage("Result:" + doubleToString(result.cGetValue()));
         }
     }
     else handleError("Unknown command");
@@ -87,8 +83,14 @@ void CLI::showMessage(const std::string& message) {
     std::cout << message << std::endl;
 }
 
-void CLI::handleError(const std::string& message) {
-    std::cerr << message << std::endl;
+void CLI::handleError(const std::string& error) {
+    std::cerr << error << std::endl;
+}
+
+void CLI::handleCErrors(const std::vector<CError*>& errors) {
+    for (int i = 0; i < errors.size(); i++) {
+		std::cerr << errors[i]->toString() << std::endl;
+	}
 }
 
 std::string CLI::doubleToString(double value) {
