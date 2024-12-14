@@ -134,7 +134,10 @@
     <ClCompile Include="CResultSerializer.h" />
     <ClCompile Include="CResultVoid.h" />
     <ClCompile Include="CTree.cpp" />
+    <ClCompile Include="CDetailedError.cpp" />
     <ClCompile Include="ErrorCode.h" />
+    <ClCompile Include="FileSaver.cpp" />
+    <ClCompile Include="HasCopy.h" />
     <ClCompile Include="Laby3.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -142,7 +145,10 @@
     <ClInclude Include="Cli.h" />
     <ClInclude Include="CResult.h" />
     <ClInclude Include="CTree.h" />
+    <ClInclude Include="CDetailedError.h" />
     <ClInclude Include="ErrorLevel.h" />
+    <ClInclude Include="FileSaver.h" />
+    <ClInclude Include="ISaver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,6 +2,7 @@
 #define CTREE_H
 
 #include "CNode.h"
+#include "CResultVoid.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -10,9 +11,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cfloat> 
-#include "CError.h"
-#include "CResult.h"
-#include "CResultVoid.h"
 #define DEFAULT_NODE_VALUE "1"
 #define DEFAULT_SIN_COS_CHILDREN 1
 #define DEFAULT_OPERATOR_CHILDREN 2
@@ -27,6 +25,15 @@
 #define SIN "sin"
 #define COS "cos"
 #define MAX4 "MAX4"
+#define LEFTOVER_MESSAGE "Ignoring leftover"
+#define EXPECTED_OPERATOR_MESSAGE "Expected operator"
+#define UNEXPECTED_EXPRESSION_END_MESSAGE "Unexpected end of expression"
+#define IGNORING_INVALID_CHAR_MESSAGE "Ignoring invalid character in variable: "
+#define ZERO_DIVISION_MESSAGE "Division by zero"
+#define UNSUPPORTED_OPERATOR_MESSAGE "Unsupported operator: "
+#define VARIABLE_NOT_FOUND_MESSAGE "Variable not found in provided values: " 
+#define INVALID_NODE_MESSAGE "Invalid node"
+#define MISSMATCHED_VARIABLES_AND_VALUES_MESSAGE "Mismatch between number of variables and provided values"
 
 class CTree {
 private:
@@ -47,6 +54,7 @@ private:
     CNode* replaceLeafWithSubtree(CNode* leaf, CNode* subtree) const;
     CNode* replaceLeafWithSubtree(CNode* leaf, CNode* subtree, bool& replaced) const;
     int getRequiredArgs(const std::string& operatorToken) const;
+    void addErrors(std::vector<CError*>& errors, const std::vector<CError*>& newErrors) const;
 
 public:
     CTree();

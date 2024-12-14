@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdexcept>
 #include <iostream>
+#include "HasCopy.h"
 
 template <typename T, typename E>
 class CResult {
@@ -11,6 +12,7 @@ public:
     CResult(const T& cValue);
     CResult(E* pcError);
     CResult(const T& cValue, std::vector<E*>& vErrors);
+    CResult(const T& cValue, E* error);
     CResult(std::vector<E*>& vErrors);
     CResult(const CResult<T, E>& other);
     ~CResult();
@@ -29,6 +31,8 @@ public:
 private:
     T* pcValue;
     std::vector<E*> errors;
+    bool isSaved = false;
+    void SetErrors(const std::vector<E*>& vErrors);
 };
 
 
@@ -48,12 +52,11 @@ CResult<T, E>::CResult(std::vector<E*>& vErrors) : pcValue(NULL), errors(vErrors
 
 template <typename T, typename E>
 CResult<T, E>::CResult(const CResult<T, E>& other) : pcValue(NULL), errors() {
+    isSaved = other.isSaved;
     if (other.pcValue != NULL) {
         pcValue = new T(*(other.pcValue));
     }
-    for (int i = 0; i < other.errors.size(); ++i) {
-        errors.push_back(new E(*(other.errors[i])));
-    }
+    SetErrors(other.errors);
 }
 
 template <typename T, typename E>
@@ -89,10 +92,7 @@ CResult<T, E>& CResult<T, E>::operator=(const CResult<T, E>& other) {
         for (int i = 0; i < errors.size(); ++i) {
             delete errors[i];
         }
-
-        for (int i = 0; i < other.errors.size(); ++i) {
-            errors.push_back(new E(*(other.errors[i])));
-        }
+        SetErrors(other.errors);
     }
     return *this;
 }
@@ -117,4 +117,17 @@ const std::vector<E*>& CResult<T, E>::vGetErrors() const {
     return errors;
 }
 
+template <typename T, typename E>
+void CResult<T, E>::SetErrors(const std::vector<E*>& vErrors) {
+    for (int i = 0; i < vErrors.size(); ++i) {
+        if (vErrors[i] != nullptr) {
+            if (HasCopy<E>::value) {
+                errors.push_back(vErrors[i]->copy());
+            }
+            else {
+                errors.push_back(new E(*vErrors[i]));
+            }
+        }
+    }
+}
 #endif 

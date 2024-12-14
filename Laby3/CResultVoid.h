@@ -4,6 +4,7 @@
 #include <vector>
 #include "CResult.h"
 #include "CError.h"
+using namespace std;
 
 template <typename E>
 class CResult<void, E> {
@@ -25,6 +26,8 @@ public:
 
 private:
     std::vector<E*> errors;
+    void SetErrors(std::vector<E*> vErrors);
+    bool isSaved = false;
 };
 
 template <typename E>
@@ -37,17 +40,13 @@ CResult<void, E>::CResult(E* pcError) : errors() {
 
 template <typename E>
 CResult<void, E>::CResult(std::vector<E*>& vErrors) : errors() {
-    for (int i = 0; i < vErrors.size(); ++i) {
-        errors.push_back(new E(*vErrors[i]));
-    }
+    SetErrors(vErrors);
 }
-
 
 template <typename E>
 CResult<void, E>::CResult(const CResult<void, E>& cOther) : errors() {
-    for (int i = 0; i < cOther.errors.size(); ++i) {
-        errors.push_back(new E(*cOther.errors[i]));
-    }
+    SetErrors(cOther.errors);
+    isSaved = cOther.isSaved;
 }
 
 
@@ -80,9 +79,7 @@ CResult<void, E>& CResult<void, E>::operator=(const CResult<void, E>& cOther) {
 		delete errors[i];
 	}
         errors.clear();
-        for (int i = 0; i < cOther.errors.size(); ++i) {
-            errors.push_back(new E(*cOther.errors[i]));
-        }
+        SetErrors(cOther.errors);
     }
     return *this;
 }
@@ -95,6 +92,20 @@ bool CResult<void, E>::bIsError() const {
 template <typename E>
 const std::vector<E*>& CResult<void, E>::vGetErrors() const {
     return errors;
+}
+
+template <typename E>
+void CResult<void, E>::SetErrors(std::vector<E*> vErrors) {
+    for (int i = 0; i < vErrors.size(); ++i) {
+        if (vErrors[i] != nullptr) {
+            if (HasCopy<E>::value) {
+                errors.push_back(vErrors[i]->copy());
+            }
+            else {
+                errors.push_back(new E(*vErrors[i]));
+            }
+        }
+    }
 }
 
 #endif

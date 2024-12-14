@@ -4,14 +4,20 @@
 #include <string>
 #include <vector>
 #include "CTree.h"
-#include "CResultVoid.h"
-
 #define EXIT "exit"
 #define ENTER "enter"
 #define JOIN "join"
 #define PRINT "print"
 #define VARS "vars"
 #define COMP "comp"
+#include <iostream>
+#include <sstream>
+#include <cmath>
+#define ERROR_MESSAGE "Error: "
+#define START_INFO_MESSAGE "Enter commands (type '" EXIT "' to quit):"
+#define EXIT_MESSAGE "Exiting program. Goodbye!"
+#define UNKNOWN_COMMAND_MESSAGE "Unknown command: "
+#define RESULT_MESSAGE "Result: "
 
 class CLI {
 public:

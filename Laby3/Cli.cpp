@@ -1,7 +1,5 @@
-#include "cli.h"
-#include <iostream>
-#include <sstream>
-#include <cmath>
+#include "Cli.h"
+
 
 CLI::CLI() {}
 
@@ -10,7 +8,7 @@ void CLI::run() {
     bool running = true;
     std::string command;
 
-    showMessage("Enter commands (type '" EXIT "' to quit):");
+    showMessage(START_INFO_MESSAGE);
     while (running) {
         std::cout << "> ";
         std::getline(std::cin, command);
@@ -24,7 +22,7 @@ void CLI::parseCommand(const std::string& command, CTree& tree, bool& state) {
     iss >> cmd;
 
     if (cmd == EXIT) {
-        showMessage("Exiting program. Goodbye!");
+        showMessage(EXIT_MESSAGE);
         state = false;
     }
 
@@ -61,20 +59,20 @@ void CLI::parseCommand(const std::string& command, CTree& tree, bool& state) {
             values.push_back(value);
         }
         tree.getTreeVars(vars);
-
-        if (values.size() != vars.size()) handleError("Mismatch between number of variables and provided values");
-        else {
-            CResult<double, CError> result = tree.compute(values, vars);
-            if (result.bIsError()) handleCErrors(result.vGetErrors());
-            else showMessage("Result:" + doubleToString(result.cGetValue()));
+        CResult<double, CError> result = tree.compute(values, vars);
+        if (result.bIsError()) {
+            std::vector<CError*> errors = result.vGetErrors();
+            handleCErrors(errors);
         }
+        if (result.bIsSuccess()) showMessage(RESULT_MESSAGE + doubleToString(result.cGetValue()));
     }
-    else handleError("Unknown command");
+    else handleError(UNKNOWN_COMMAND_MESSAGE);
 }
 
 void CLI::printArray(const std::vector<std::string>& array) {
-    for (const auto& item : array) {
-        std::cout << item << " ";
+    for (int i = 0; i < array.size(); i++)
+    {
+        std::cout << array[i] << " ";
     }
     std::cout << std::endl;
 }
@@ -89,8 +87,8 @@ void CLI::handleError(const std::string& error) {
 
 void CLI::handleCErrors(const std::vector<CError*>& errors) {
     for (int i = 0; i < errors.size(); i++) {
-		std::cerr << errors[i]->toString() << std::endl;
-	}
+        std::cerr << ERROR_MESSAGE << errors[i]->toString() << std::endl;
+    }
 }
 
 std::string CLI::doubleToString(double value) {

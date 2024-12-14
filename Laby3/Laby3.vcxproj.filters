@@ -48,6 +48,15 @@
     <ClCompile Include="Cli.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CDetailedError.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HasCopy.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSaver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CTree.h">
@@ -63,6 +72,15 @@
       <Filter>Header Files\Errors\Enums</Filter>
     </ClInclude>
     <ClInclude Include="Cli.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CDetailedError.h">
+      <Filter>Header Files\Errors</Filter>
+    </ClInclude>
+    <ClInclude Include="ISaver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSaver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
