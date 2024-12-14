@@ -5,6 +5,9 @@
 #include <stdexcept>
 #include <iostream>
 #include "HasCopy.h"
+#include "ISaver.h"
+
+extern ISaver* globalSaver;
 
 template <typename T, typename E>
 class CResult {
@@ -25,30 +28,41 @@ public:
 
     bool bIsError() const;
     bool bIsSuccess() const;
+    bool bIsSaved() const {
+		return isSaved;
+	}
     T cGetValue() const;
     const std::vector<E*>& vGetErrors() const;
 
 private:
     T* pcValue;
     std::vector<E*> errors;
-    bool isSaved = false;
+    mutable bool isSaved = false;
     void SetErrors(const std::vector<E*>& vErrors);
+    void save() const;
 };
 
 
 template <typename T, typename E>
-CResult<T, E>::CResult(const T& cValue) : pcValue(new T(cValue)) {}
+CResult<T, E>::CResult(const T& cValue) : pcValue(new T(cValue)) {
+    save();
+}
 
 template <typename T, typename E>
 CResult<T, E>::CResult(E* pcError) : pcValue(NULL) {
     errors.push_back(pcError);
+    save();
 }
 
 template <typename T, typename E>
-CResult<T, E>::CResult(const T& cValue, std::vector<E*>& vErrors) : pcValue(new T(cValue)), errors(vErrors) {}
+CResult<T, E>::CResult(const T& cValue, std::vector<E*>& vErrors) : pcValue(new T(cValue)), errors(vErrors) {
+    save();
+}
 
 template <typename T, typename E>
-CResult<T, E>::CResult(std::vector<E*>& vErrors) : pcValue(NULL), errors(vErrors) {}
+CResult<T, E>::CResult(std::vector<E*>& vErrors) : pcValue(NULL), errors(vErrors) {
+    save();
+}
 
 template <typename T, typename E>
 CResult<T, E>::CResult(const CResult<T, E>& other) : pcValue(NULL), errors() {
@@ -130,4 +144,13 @@ void CResult<T, E>::SetErrors(const std::vector<E*>& vErrors) {
         }
     }
 }
+
+template <typename T, typename E>
+void CResult<T, E>::save() const {
+    if (globalSaver && !isSaved) {
+        globalSaver->save(const_cast<void*>(static_cast<const void*>(this)), typeid(*this));
+        isSaved = true;
+    }
+}
+
 #endif 

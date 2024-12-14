@@ -2,18 +2,13 @@
 #include "ErrorLevel.h"
 #include "ErrorCode.h"
 
-ISaver* globalSaver = NULL;
 
 CError::CError(ErrorCode code, ErrorLevel level, const std::string& description)
-    : code(code), level(level), description(description), isSaved(false) {
-    trySave();
-}
+    : code(code), level(level), description(description), isSaved(false) {}
 
 
 CError::CError(const CError& other)
-    : code(other.code), level(other.level), description(other.description), isSaved(other.isSaved)  {
-    trySave();
-}
+    : code(other.code), level(other.level), description(other.description), isSaved(other.isSaved)  {}
 
 ErrorCode CError::getCode() const {
     return code;
@@ -47,11 +42,4 @@ std::string CError::toString() const { //czy to powinny być stale?
     result += "Error Description: " + getDescription() + "\n";
     result += "--------------------------\n";
     return result;
-}
-
-void CError::trySave() const {
-    if (!isSaved && globalSaver) {
-        globalSaver->save(*this);
-        isSaved = true;
-    }
 }

@@ -65,7 +65,6 @@ public:
     CTree operator+(const CTree& other) const;
 
     CResult<void, CError> buildTree(std::istringstream& stream);
-    CResult<string, CError> getPrefix() const;
     void getTreeNodeValues(std::vector<std::string>& values) const;
     void getTreeVars(std::vector<std::string>& vars) const;
     CResult<double, CError> compute(const std::vector<double>& values, const std::vector<std::string>& vars) const;

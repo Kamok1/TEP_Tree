@@ -220,10 +220,6 @@ CResult<std::string, CError> CTree::sanitizeVariable(const std::string& variable
     return CResult<std::string, CError>(sanitized, errors);
 }
 
-CResult<string,CError> CTree::getPrefix() const {
-    return "a";
-}
-
 CResult<CNode*, CError> CTree::buildSubtree(std::istringstream& stream, bool hasToBeOperator) {
     std::string token;
     std::vector<CError*> accumulatedErrors;

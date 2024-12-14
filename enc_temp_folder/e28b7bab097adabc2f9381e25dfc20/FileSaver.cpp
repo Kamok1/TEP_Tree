@@ -36,7 +36,7 @@ void FileSaver::saveTreeResult(CResult<CTree*, CError>* result, std::ofstream& f
         saveErrors(result->vGetErrors(), file);
     }
     if (result->bIsSuccess()) {
-        file << "Tree (prefix): " << result->cGetValue()->getPrefix().cGetValue() << std::endl;
+        file << "Tree (prefix): " << "AA" << std::endl;
     }
 }
 

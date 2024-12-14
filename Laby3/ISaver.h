@@ -2,14 +2,12 @@
 #define ISAVER_H
 
 #include <string>
-#include "CError.h"
-
-class CError;
+#include <typeinfo>
 
 class ISaver {
 public:
-    virtual ~ISaver() {};
-    virtual void save(const CError& error) const = 0;
+    virtual ~ISaver() {}
+    virtual void save(void* result, const std::type_info& type) const = 0;
 };
 
 #endif

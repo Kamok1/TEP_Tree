@@ -4,10 +4,6 @@
 #include <string>
 #include "ErrorLevel.h" 
 #include "ErrorCode.h"
-#include "ISaver.h"
-
-class ISaver;
-extern ISaver* globalSaver;
 
 class CError {
 public:
@@ -17,6 +13,12 @@ public:
     ErrorCode getCode() const;
     ErrorLevel getLevel() const;
     std::string getDescription() const;
+    bool isSavedGet() const {
+		return isSaved;
+	}
+    void isSavedSet(bool isSaved) const{
+        		this->isSaved = isSaved;
+    }
     virtual std::string toString() const;
     virtual ~CError() {}
     virtual CError* clone() const;
@@ -28,7 +30,6 @@ private:
     ErrorLevel level;
     std::string description;
     mutable bool isSaved = false; 
-    void trySave() const;
     std::string errorLevelToString() const; 
 };
 
