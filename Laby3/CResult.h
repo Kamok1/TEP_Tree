@@ -7,8 +7,7 @@
 #include "HasCopy.h"
 #include "SaverManager.h"
 #include "CError.h"
-
-extern SaverManager* saverMangager;
+#include "Globals.h"
 
 template <typename T, typename E>
 class CResult {
@@ -40,7 +39,7 @@ private:
     std::vector<E*> errors;
     mutable bool isSaved = false;
     void SetErrors(const std::vector<E*>& vErrors);
-    void save() const;
+    void save();
 };
 
 
@@ -136,7 +135,7 @@ const std::vector<E*>& CResult<T, E>::vGetErrors() const {
 }
 
 template <typename T, typename E>
-void CResult<T, E>::SetErrors(const std::vector<E*>& vErrors) {
+void CResult<T, E>::SetErrors(const std::vector<E*>& vErrors){
     for (int i = 0; i < vErrors.size(); ++i) {
         if (vErrors[i] != nullptr) {
             if (HasCopy<E>::value) {
@@ -150,7 +149,7 @@ void CResult<T, E>::SetErrors(const std::vector<E*>& vErrors) {
 }
 
 template <typename T, typename E>
-void CResult<T, E>::save() const { 
+void CResult<T, E>::save() { 
     if (saverMangager && !isSaved && typeid(E) == typeid(CError)) {
         isSaved = saverMangager->save(static_cast<const void*>(this), typeid(T));
     }
