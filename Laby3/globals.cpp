@@ -1,3 +1,3 @@
-#include "globals.h"
+#include "Globals.h"
 
 ISaver* globalSaver = nullptr;

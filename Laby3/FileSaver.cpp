@@ -12,7 +12,7 @@ FileSaver::FileSaver(const std::string& filePath) : filePath(filePath) {}
 void FileSaver::save(void* result, const std::type_info& type) const {
     std::ofstream file(filePath.c_str(), std::ios::app);
     if (!file.is_open()) {
-        throw std::runtime_error("Unable to open file: " + filePath);
+        throw std::runtime_error(FILESAVER_ERROR_OPEN_FILE + filePath);
     }
 
     if (type == typeid(CResult<CTree*, CError>)) {
@@ -36,16 +36,13 @@ void FileSaver::saveTreeResult(CResult<CTree*, CError>* result, std::ofstream& f
         saveErrors(result->vGetErrors(), file);
     }
     if (result->bIsSuccess()) {
-        file << "Tree (prefix): " << result->cGetValue()->getPrefix().cGetValue() << std::endl;
+        file << result->cGetValue()->getPrefix().cGetValue() << "\n" << std::endl;
     }
 }
 
 void FileSaver::saveGenericResult(CResult<void*, CError>* result, std::ofstream& file) const {
     if (result->bIsError()) {
         saveErrors(result->vGetErrors(), file);
-    }
-    else {
-        file << "Result Value: " << result->cGetValue() << std::endl;
     }
 }
 

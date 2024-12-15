@@ -7,6 +7,9 @@
 #include <string>
 #include "CResult.h"
 #include "CTree.h"
+
+#define FILESAVER_ERROR_OPEN_FILE "Error opening file"
+
 class FileSaver : public ISaver {
 public:
     explicit FileSaver(const std::string& filePath);

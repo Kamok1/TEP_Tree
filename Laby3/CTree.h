@@ -53,6 +53,7 @@ private:
     CResult<std::string, CError> sanitizeVariable(const std::string& variable) const;
     CNode* replaceLeafWithSubtree(CNode* leaf, CNode* subtree) const;
     CNode* replaceLeafWithSubtree(CNode* leaf, CNode* subtree, bool& replaced) const;
+    std::string buildPrefix(CNode* node) const;
     int getRequiredArgs(const std::string& operatorToken) const;
     void addErrors(std::vector<CError*>& errors, const std::vector<CError*>& newErrors) const;
 

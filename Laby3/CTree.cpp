@@ -220,8 +220,20 @@ CResult<std::string, CError> CTree::sanitizeVariable(const std::string& variable
     return CResult<std::string, CError>(sanitized, errors);
 }
 
-CResult<string,CError> CTree::getPrefix() const {
-    return "a";
+CResult<std::string, CError> CTree::getPrefix() const {
+    if (!root) {
+        return new CError(ERROR_NULL_REFERENCE, ERROR, INVALID_NODE_MESSAGE);
+    }
+    return buildPrefix(root);
+}
+
+std::string CTree::buildPrefix(CNode* node) const {
+    std::string result = node->getValue();
+    for (int i = 0; i < node->getChildCount(); ++i) {
+        CNode* child = node->getChild(i);
+        result += " " + buildPrefix(child);
+    }
+    return result;
 }
 
 CResult<CNode*, CError> CTree::buildSubtree(std::istringstream& stream, bool hasToBeOperator) {
