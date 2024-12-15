@@ -10,6 +10,27 @@ CTree::CTree(const CTree& other) : root(NULL) {
         root = copySubtree(other.root);
 }
 
+CTree::CTree(CTree&& other) : root(other.root) {
+    other.root = nullptr;
+}
+
+CTree& CTree::operator=(CTree&& other) {
+    if (this != &other) {
+        deleteTree(root);
+        root = other.root;
+        other.root = nullptr; 
+    }
+    return *this;
+}
+
+CTree& CTree::operator=(const CTree& other) {
+    if (this != &other) {
+        deleteTree(root);
+        root = copySubtree(other.root);
+    }
+    return *this;
+}
+
 CNode* CTree::copySubtree(CNode* node) const{
     if (!node) 
         return NULL;
@@ -21,14 +42,6 @@ CNode* CTree::copySubtree(CNode* node) const{
     }
 
     return newNode;
-}
-
-CTree& CTree::operator=(const CTree& other) {
-    if (this != &other) {
-        deleteTree(root);
-        root = copySubtree(other.root);
-    }
-    return *this;
 }
 
 CTree CTree::operator+(const CTree& other) const {

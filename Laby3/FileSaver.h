@@ -12,7 +12,7 @@
 
 class FileSaver : public ISaver {
 public:
-    explicit FileSaver(const std::string& filePath);
+    FileSaver(const std::string& filePath);
     virtual void save(void* result, const std::type_info& type) const;
 
 private:

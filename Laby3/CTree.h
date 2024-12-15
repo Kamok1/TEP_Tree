@@ -61,8 +61,10 @@ public:
     CTree();
     ~CTree();
     CTree(const CTree& other);
+    CTree(CTree&& other);
 
     CTree& operator=(const CTree& other);
+    CTree& operator=(CTree&& other);
     CTree operator+(const CTree& other) const;
 
     CResult<void, CError> buildTree(std::istringstream& stream);

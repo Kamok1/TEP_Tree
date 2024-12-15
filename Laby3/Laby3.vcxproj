@@ -132,6 +132,7 @@
     <ClCompile Include="CNode.cpp" />
     <ClCompile Include="CNode.h" />
     <ClCompile Include="CResultVoid.h" />
+    <ClCompile Include="CMySmartPointer.h" />
     <ClCompile Include="CTree.cpp" />
     <ClCompile Include="CDetailedError.cpp" />
     <ClCompile Include="ErrorCode.h" />
@@ -143,6 +144,7 @@
   <ItemGroup>
     <ClInclude Include="CError.h" />
     <ClInclude Include="Cli.h" />
+    <ClInclude Include="CRefCounter.h" />
     <ClInclude Include="CResult.h" />
     <ClInclude Include="CTree.h" />
     <ClInclude Include="CDetailedError.h" />
