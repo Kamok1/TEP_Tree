@@ -1,8 +1,8 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include "ISaver.h"
+#include "SaverManager.h"
 
-extern ISaver* globalSaver;
+extern SaverManager* saverMangager;
 
-#endif
+#endif 

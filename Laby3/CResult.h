@@ -1,13 +1,14 @@
-#ifndef CRESULT_H
+﻿#ifndef CRESULT_H
 #define CRESULT_H
 
 #include <vector>
 #include <stdexcept>
 #include <iostream>
 #include "HasCopy.h"
-#include "ISaver.h"
+#include "SaverManager.h"
+#include "CError.h"
 
-extern ISaver* globalSaver;
+extern SaverManager* saverMangager;
 
 template <typename T, typename E>
 class CResult {
@@ -63,6 +64,9 @@ template <typename T, typename E>
 CResult<T, E>::CResult(std::vector<E*>& vErrors) : pcValue(NULL), errors(vErrors) {
     save();
 }
+
+//template <typename T>
+//CResult<T, CError>::CResult(std::vector<CError*>& vErrors) : pcValue(NULL), errors(vErrors) {}
 
 template <typename T, typename E>
 CResult<T, E>::CResult(const CResult<T, E>& other) : pcValue(NULL), errors() {
@@ -146,10 +150,9 @@ void CResult<T, E>::SetErrors(const std::vector<E*>& vErrors) {
 }
 
 template <typename T, typename E>
-void CResult<T, E>::save() const {
-    if (globalSaver && !isSaved) {
-        globalSaver->save(const_cast<void*>(static_cast<const void*>(this)), typeid(*this));
-        isSaved = true;
+void CResult<T, E>::save() const { 
+    if (saverMangager && !isSaved && typeid(E) == typeid(CError)) {
+        isSaved = saverMangager->save(static_cast<const void*>(this), typeid(T));
     }
 }
 

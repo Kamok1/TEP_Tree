@@ -1,3 +1,3 @@
 #include "Globals.h"
 
-ISaver* globalSaver = nullptr;
+SaverManager* saverMangager = nullptr;
