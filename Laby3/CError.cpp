@@ -36,7 +36,7 @@ std::string CError::errorLevelToString() const {
     }
 }
 
-std::string CError::toString() const { //czy to powinny być stale?
+std::string CError::toString() const {
     std::string result = "Error Code: " + std::to_string(getCode()) + "\n";
     result += "Error Level: " + errorLevelToString() + "\n";
     result += "Error Description: " + getDescription() + "\n";
