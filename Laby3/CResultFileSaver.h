@@ -66,9 +66,15 @@ void CResultFileSaver<T>::saveResult(const CResult<T, CError>& result, std::ofst
     if (result.bIsError()) {
         saveErrors(result.vGetErrors(), file);
     }
+}
 
-    if (result.bIsSuccess() && typeid(T) == typeid(CTree*)) {
-        const CTree* treeValue = static_cast<const CTree*>(result.cGetValue());
+template <>
+void CResultFileSaver<CTree*>::saveResult(const CResult<CTree*, CError>& result, std::ofstream& file) const {
+    if (result.bIsError()) {
+        saveErrors(result.vGetErrors(), file);
+    }
+    if (result.bIsSuccess()) {
+        const CTree* treeValue = static_cast<CTree*>(result.cGetValue());
         if (treeValue) {
             file << FILESAVER_TREE_PREFIX << treeValue->getPrefix().cGetValue() << std::endl;
         }
