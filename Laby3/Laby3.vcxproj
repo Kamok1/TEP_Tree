@@ -145,6 +145,7 @@
     <ClInclude Include="CError.h" />
     <ClInclude Include="Cli.h" />
     <ClInclude Include="CMySmartPointer.h" />
+    <ClInclude Include="CRefCounter.h" />
     <ClInclude Include="CResult.h" />
     <ClInclude Include="CTree.h" />
     <ClInclude Include="CDetailedError.h" />
