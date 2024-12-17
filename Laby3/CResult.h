@@ -64,9 +64,6 @@ CResult<T, E>::CResult(std::vector<E*>& vErrors) : pcValue(NULL), errors(vErrors
     save();
 }
 
-//template <typename T>
-//CResult<T, CError>::CResult(std::vector<CError*>& vErrors) : pcValue(NULL), errors(vErrors) {}
-
 template <typename T, typename E>
 CResult<T, E>::CResult(const CResult<T, E>& other) : pcValue(NULL), errors() {
     isSaved = other.isSaved;

@@ -1,4 +1,8 @@
-#include "CTree.h"
+﻿#include "CTree.h"
+
+int CTree::copyCount = 0;
+int CTree::moveCount = 0;
+
 CTree::CTree() : root(NULL) {}
 
 CTree::~CTree() {
@@ -6,11 +10,13 @@ CTree::~CTree() {
 }
 
 CTree::CTree(const CTree& other) : root(NULL) {
+    ++copyCount;
     if (other.root)
         root = copySubtree(other.root);
 }
 
 CTree::CTree(CTree&& other) : root(other.root) {
+    ++moveCount;
     other.root = nullptr;
 }
 
@@ -27,7 +33,8 @@ CNode* CTree::copySubtree(CNode* node) const{
     return newNode;
 }
 
-CTree& CTree::operator=(CTree&& other) {
+CTree CTree::operator=(CTree&& other) {
+    ++moveCount;
     if (this != &other) {
         deleteTree(root);
         root = other.root;
@@ -36,7 +43,8 @@ CTree& CTree::operator=(CTree&& other) {
     return *this;
 }
 
-CTree& CTree::operator=(const CTree& other) {
+CTree CTree::operator=(const CTree& other) {
+    ++copyCount;
     if (this != &other) {
         deleteTree(root);
         root = copySubtree(other.root);
@@ -55,7 +63,7 @@ CTree CTree::operator+(const CTree& other) const {
     else if (other.root) {
         newTree.root = copySubtree(other.root);
     }
-    return newTree;
+    return newTree; //gdyby nie było oprogrmowanych movesemtanics to tworzyło by się kopie, tak kompilator sam to zrobi
 }
 
 CNode* CTree::replaceLeafWithSubtree(CNode* node, CNode* subtree) const {
@@ -305,6 +313,11 @@ int CTree::getRequiredArgs(const std::string& operatorToken) const {
     return DEFAULT_CHILDREN;
 }
 
+
+//TEST ONLY
+void CTree::printStats() {
+    std::cout << "Liczba kopii: " << copyCount << ", Liczba przeniesień: " << moveCount << "\n";
+}
 
 CResult<void, CError> CTree::buildTree(std::istringstream& stream) {
     deleteTree(root);

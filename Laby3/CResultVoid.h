@@ -28,6 +28,7 @@ private:
     std::vector<E*> errors;
     void SetErrors(std::vector<E*> vErrors);
     bool isSaved = false;
+    void save();
 };
 
 template <typename E>
@@ -108,4 +109,10 @@ void CResult<void, E>::SetErrors(std::vector<E*> vErrors) {
     }
 }
 
+template <typename E>
+void CResult<void, E>::save() {
+    if (saverMangager && !isSaved && typeid(E) == typeid(CError)) {
+        isSaved = saverMangager->save(static_cast<const void*>(this), typeid(void*));
+    }
+}
 #endif

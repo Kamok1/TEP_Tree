@@ -1,6 +1,0 @@
-Error: Error Code: 1001
-Error Level: CRITICAL
-Error Description: TEST
---------------------------
-
-Tree Prefix: + 1 2

@@ -1,4 +1,4 @@
-#ifndef CTREE_H
+﻿#ifndef CTREE_H
 #define CTREE_H
 
 #include "CNode.h"
@@ -38,6 +38,10 @@
 class CTree {
 private:
     CNode* root;
+
+    static int copyCount;
+    static int moveCount;  // Licznik przeniesień
+
     void deleteTree(CNode* node);
     void fixExpression(CNode* node);
     void getNodes(CNode* node, std::vector<std::string>& values) const;
@@ -63,9 +67,8 @@ public:
     ~CTree();
     CTree(const CTree& other);
     CTree(CTree&& other);
-
-    CTree& operator=(CTree&& other);
-    CTree& operator=(const CTree& other);
+    CTree operator=(CTree&& other);
+    CTree operator=(const CTree& other);
     CTree operator+(const CTree& other) const;
 
     CResult<void, CError> buildTree(std::istringstream& stream);
@@ -73,6 +76,7 @@ public:
     void getTreeNodeValues(std::vector<std::string>& values) const;
     void getTreeVars(std::vector<std::string>& vars) const;
     CResult<double, CError> compute(const std::vector<double>& values, const std::vector<std::string>& vars) const;
+    static void printStats();
 };
 
 #endif

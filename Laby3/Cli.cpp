@@ -10,7 +10,7 @@ void CLI::run() {
 
     showMessage(START_INFO_MESSAGE);
     while (running) {
-        std::cout << "> ";
+        std::cout << CONSOLE_SIGN;
         std::getline(std::cin, command);
         parseCommand(command, tree, running);
     }

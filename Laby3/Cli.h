@@ -18,6 +18,7 @@
 #define EXIT_MESSAGE "Exiting program. Goodbye!"
 #define UNKNOWN_COMMAND_MESSAGE "Unknown command: "
 #define RESULT_MESSAGE "Result: "
+#define CONSOLE_SIGN "> "
 
 class CLI {
 public:
